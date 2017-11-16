@@ -32,6 +32,8 @@ public class PlayerMenu : MonoBehaviour {
         Debug.Log("Player side:" + playerSide);
     }
 
+    public Team GetPlayerSide(){ return playerSide;    }
+
     /// <summary>
     /// Set action points.
     /// </summary>
@@ -136,12 +138,12 @@ public class PlayerMenu : MonoBehaviour {
 		TileType tile_type = gridManager.GetTileType (pos);
 		if (tile_type == TileType.NullTile || coll) return;
 		if (tile_type == TileType.Empty) {
-			gridManager.IllumPosition(pos, new Color(0, 1, 0, 1));
+			gridManager.IllumPosition(pos, Highlight.Plain);
         }
 		else if ((playerSide == Team.Blue && tile_type == TileType.RedRock) || 
 				 (playerSide == Team.Red && tile_type == TileType.BlueRock) || 
 				 (tile_type == TileType.NeutralRock)) {
-			gridManager.IllumPosition(pos, new Color(1, 0, 0, 1));
+			gridManager.IllumPosition(pos, Highlight.Rock);
         } else {
     		// Debug.Log("Tag: " + gridManager.tilePositions[pos].tag);
         }
@@ -170,7 +172,7 @@ public class PlayerMenu : MonoBehaviour {
         activeObject = obj;
         movementMode = true;
     }
-
+    /*
     /// <summary>
     /// Set position's color back to normal
     /// </summary>
@@ -179,11 +181,11 @@ public class PlayerMenu : MonoBehaviour {
     {
 		if (gridManager.GetTileType(pos) == TileType.NullTile)
             return;
-		gridManager.IllumPosition(pos, new Color(1,1,1,1));
-    }
+		gridManager.IllumPosition(pos, Color.white);
+    }*/
 
     void DeactivateMovementMode()
-    {
+    {/*
         if (activeObject != null)
         {
             Debug.Log("Deactivating Movement mode");
@@ -191,7 +193,8 @@ public class PlayerMenu : MonoBehaviour {
             DellumPosition(activeObject.transform.position + Vector3.right);
             DellumPosition(activeObject.transform.position + Vector3.down);
             DellumPosition(activeObject.transform.position + Vector3.left);
-        }
+        }*/
+        gridManager.DellumPositions();
         activeObject = null;
         movementMode = false;
     }

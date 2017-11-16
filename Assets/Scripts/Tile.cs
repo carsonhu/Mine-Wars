@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum Highlights
+public enum Highlight
 {
     Plain, Rock, None
 }
@@ -14,11 +14,11 @@ public class Tile : MonoBehaviour {
     public bool hasBomb = false; //is there a bomb
     public Team affiliation; //Neutral, Blue, Red
 
-    public void HighlightTile(Highlights highlight)
+    public void HighlightTile(Highlight highlight)
     {
-        if (highlight == Highlights.Plain)
+        if (highlight == Highlight.Plain)
             GetComponent<SpriteRenderer>().color = Color.green;
-        else if (highlight == Highlights.Rock)
+        else if (highlight == Highlight.Rock)
             GetComponent<SpriteRenderer>().color = Color.red;
         else
             GetComponent<SpriteRenderer>().color = Color.white;

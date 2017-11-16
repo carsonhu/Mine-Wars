@@ -5,8 +5,8 @@ using Random = UnityEngine.Random;
 
 public class GridManager : MonoBehaviour
 {
-    private int rows = 7;
-    private int columns = 7;
+    private int rows = 6;
+    private int columns = 9;
 
     public Dictionary<Vector3, GameObject> tilePositions = new Dictionary<Vector3, GameObject>();
     public List<GameObject> redPawns = new List<GameObject>();
@@ -16,15 +16,16 @@ public class GridManager : MonoBehaviour
     public Transform boardHolder;
 
     private List<Vector3> gridPositions = new List<Vector3>(); //we use this to get a list of empty grid positions
+    List<Vector3> illuminatedPositions = new List<Vector3>();
     public int GetColumns() { return columns; }
     public int GetRows() { return rows; }
 
     void InitializeList()
     {
         gridPositions.Clear();
-        for(int i = 0; i < rows; i++)
+        for(int i = 0; i < columns; i++)
         {
-            for(int j = 0;  j < columns; j++)
+            for(int j = 0;  j < rows; j++)
             {
                 gridPositions.Add(new Vector3(i, j, 0f));
             }
@@ -125,7 +126,7 @@ public class GridManager : MonoBehaviour
     {
         BoardSetup();
         InitializeList();
-        LayoutObjectAtRandom("plain", 24);
+        LayoutObjectAtRandom("plain", rows*columns - 25);
         LayoutObjectAtRandom("redRock", 5);
         LayoutObjectAtRandom("blueRock", 5);
         LayoutObjectAtRandom("rock", 15);
@@ -136,12 +137,13 @@ public class GridManager : MonoBehaviour
 	// and different colors. That sort of logic should go in HIGHER level functions that call
 	// the following functions, passing in the desired color and position.
 	// Highlights a single position with the given color.
-	public void IllumPosition(Vector3 pos, Color color) {
-		tilePositions[pos].GetComponent<SpriteRenderer>().color = color;
+	public void IllumPosition(Vector3 pos, Highlight color) {
+		tilePositions[pos].GetComponent<Tile>().HighlightTile(color);
+        illuminatedPositions.Add(pos);
 	}
 
 	// Highlights tiles adjacent to pos with the given color.
-	public void IllumAdjacent(Vector3 pos, Color color) {
+	public void IllumAdjacent(Vector3 pos, Highlight color) {
 		IllumPosition(pos + Vector3.right, color);
 		IllumPosition(pos + Vector3.left, color);
 		IllumPosition(pos + Vector3.up, color);
@@ -149,12 +151,31 @@ public class GridManager : MonoBehaviour
 	}
 
 	// Highlights the given team with the given color.
-	public void IllumTeam(Team t, Color color) {
+	public void IllumTeam(Team t, Highlight color) {
 		List<GameObject> team_list = (t == Team.Red) ? redPawns : bluePawns;
 		foreach (GameObject pawn in team_list) {
 			IllumPosition (pawn.transform.position, color);
 		}
 	}
+    //Highlights list of positions as certain color
+    public void IllumPositions(List<Vector3> poses, Highlight color)
+    {
+        foreach(Vector3 pos in poses)
+        {
+            IllumPosition(pos, color);
+        }
+    }
+
+    public bool IsIlluminated(Vector3 pos) { return illuminatedPositions.Contains(pos); }
+
+    public void DellumPositions()
+    {
+        foreach(Vector3 pos in illuminatedPositions)
+        {
+            tilePositions[pos].GetComponent<Tile>().HighlightTile(Highlight.None);
+        }
+        illuminatedPositions.Clear();
+    }
 
 	public TileType GetTileType(Vector3 pos) {
 		if (!tilePositions.ContainsKey (pos)) {
