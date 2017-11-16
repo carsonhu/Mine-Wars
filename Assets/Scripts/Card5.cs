@@ -80,19 +80,13 @@ public class Card5 : PlayerCard {
         GameManager gam = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
         PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
-        if (!isInCharge && pm.enabled && (pm.playerSide == gam.playersTurn)) //currently just checks player menu
+        if (!isInCharge && pm.enabled && (pm.playerSide == gam.playersTurn)) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
         {
             isInCharge = true;
             pm.enabled = false;
             TogglePhase(CardPhase.phase1, gm, pm);
         }
     }
-    
-
-
-
-
-
 
 private void Start()    //THIS IS TEMPORARY SO THAT BOTH PLAYERS' BUTTONS ARENT JUST IN THE SAME PLACE
 {
@@ -113,5 +107,10 @@ void Update () {
        PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
        applyEffect(gm, pm);
    }
+   if (Input.GetMouseButtonDown(1))
+   {
+       TogglePhase(CardPhase.action, GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>(), transform.parent.GetComponent<PlayerMenu>());
+   }
+
 }
 }
