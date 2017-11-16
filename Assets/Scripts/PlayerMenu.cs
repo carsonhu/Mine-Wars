@@ -172,28 +172,10 @@ public class PlayerMenu : MonoBehaviour {
         activeObject = obj;
         movementMode = true;
     }
-    /*
-    /// <summary>
-    /// Set position's color back to normal
-    /// </summary>
-    /// <param name="pos"></param>
-    void DellumPosition(Vector3 pos)
-    {
-		if (gridManager.GetTileType(pos) == TileType.NullTile)
-            return;
-		gridManager.IllumPosition(pos, Color.white);
-    }*/
+
 
     void DeactivateMovementMode()
-    {/*
-        if (activeObject != null)
-        {
-            Debug.Log("Deactivating Movement mode");
-            DellumPosition(activeObject.transform.position + Vector3.up);
-            DellumPosition(activeObject.transform.position + Vector3.right);
-            DellumPosition(activeObject.transform.position + Vector3.down);
-            DellumPosition(activeObject.transform.position + Vector3.left);
-        }*/
+    {
         gridManager.DellumPositions();
         activeObject = null;
         movementMode = false;
@@ -281,7 +263,7 @@ public class PlayerMenu : MonoBehaviour {
             //if playerCards isn't active: if it's active, we let playerCards deal with the clickstuff since there's some unique cases
             if (Input.GetMouseButtonDown(0))
             {
-                if (gameManager.getPhase() == Phase.Game)
+                if (gameManager.getPhase() == Phase.Game && !turnPanelOpen)
                     GameSelect();
                 else
                     ClickSelect();
