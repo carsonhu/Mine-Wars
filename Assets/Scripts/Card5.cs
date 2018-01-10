@@ -13,16 +13,25 @@ public class Card5 : PlayerCard {
     //then restore control to player menu
 
     private CardPhase currentPhase;
-    private bool isInCharge = false; //tells the player menu that this card is in charge now. We probably move this stuff to the hand manager?
+//    private bool isInCharge = false; //tells the player menu that this card is in charge now. We probably move this stuff to the hand manager?
     GridManager gm;
     GameObject pawn1;
     GameObject pawn2;
 
+    /// <summary>
+    /// an enum for the card phases
+    /// </summary>
     private enum CardPhase
     {
         phase1, phase2, action
     }
 
+    /// <summary>
+    /// Click Behavior for each phase
+    /// </summary>
+    /// <param name="gm">grid manager</param>
+    /// <param name="pm">player menu</param>
+    /// <returns>theoretically you need to return whether it applied</returns>
     public override bool applyEffect(GridManager gm, PlayerMenu pm) //click behavior
     {
         Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
@@ -45,12 +54,8 @@ public class Card5 : PlayerCard {
     }
     void RestorePM(PlayerMenu pm)
     {
-        if (isInCharge)
-        {
-            isInCharge = false;
-            if (!pm.enabled)
-                pm.enabled = true;
-        }
+        if (!pm.enabled)
+            pm.enabled = true;
     }
 
     void TogglePhase(CardPhase phase, GridManager gm, PlayerMenu pm)
@@ -79,10 +84,10 @@ public class Card5 : PlayerCard {
      //  GameObject GameController = GameObject.FindGameObjectWithTag("GameController");
         GameManager gam = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-        PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
-        if (!isInCharge && pm.enabled && (pm.playerSide == gam.playersTurn)) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
+        PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
+        if (pm.enabled && (pm.playerSide == gam.playersTurn)) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
         {
-            isInCharge = true;
+            //isInCharge = true;
             pm.enabled = false;
             TogglePhase(CardPhase.phase1, gm, pm);
         }
@@ -90,7 +95,7 @@ public class Card5 : PlayerCard {
 
 private void Start()    //THIS IS TEMPORARY SO THAT BOTH PLAYERS' BUTTONS ARENT JUST IN THE SAME PLACE
 {
-   PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
+   PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
    if(pm.GetPlayerSide() == Team.Blue)
    {
        transform.position = transform.position + new Vector3(0, 7, 0);
@@ -101,16 +106,18 @@ private void Start()    //THIS IS TEMPORARY SO THAT BOTH PLAYERS' BUTTONS ARENT 
 void Update () {
 
 
-   if (Input.GetMouseButtonDown(0) && isInCharge)
-   {
-       GridManager gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-       PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
-       applyEffect(gm, pm);
-   }
-   if (Input.GetMouseButtonDown(1))
-   {
-       TogglePhase(CardPhase.action, GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>(), transform.parent.GetComponent<PlayerMenu>());
-   }
-
+        if (GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().getPhase() == Phase.Game)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                GridManager gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
+                PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
+                applyEffect(gm, pm);
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                TogglePhase(CardPhase.action, GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>(), transform.parent.GetComponent<PlayerMenu>());
+            }
+        }
 }
 }

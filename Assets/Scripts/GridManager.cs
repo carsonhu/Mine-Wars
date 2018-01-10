@@ -67,6 +67,14 @@ public class GridManager : MonoBehaviour
         }
     }
     
+    public bool IsAdjacentToObject(TileType tag, Vector3 pos)
+    {
+        if (GetTileType(pos + Vector3.right) == tag || GetTileType(pos + Vector3.left) == tag || GetTileType(pos + Vector3.down) == tag || GetTileType(pos + Vector3.up) == tag)
+            return true;
+        else
+            return false;
+    }
+
     private void _ActivateBombHelper(Vector3 pos)
     {
         if (tilePositions.ContainsKey(pos))
