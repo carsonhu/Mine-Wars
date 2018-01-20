@@ -14,7 +14,7 @@ public class PlayerMenu : MonoBehaviour {
     bool turnPanelOpen = false;
     GameObject turnPanel;
     //we'll have a variable referencing playerCards
-
+    
 
 	// Use this for initialization
 	void Start () {

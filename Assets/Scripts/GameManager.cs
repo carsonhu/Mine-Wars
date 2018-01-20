@@ -119,6 +119,14 @@ public class GameManager : MonoBehaviour {
 
         p1Menu.GetComponent<PlayerMenu>().SetAP(redAP);
         p2Menu.GetComponent<PlayerMenu>().SetAP(blueAP);
+
+        int[] rocks = gridScript.CountRocks(); //rocks[0] is red, rocks[1] is blue
+        if (rocks[0] == 0 && rocks[1] != 0)
+            Debug.Log("Blue wins!");
+        else if (rocks[0] != 0 && rocks[1] == 0)
+            Debug.Log("Red wins!");
+        else if (rocks[0] == 0 && rocks[1] == 0)
+            Debug.Log("Nobody wins!");
     }
 
 

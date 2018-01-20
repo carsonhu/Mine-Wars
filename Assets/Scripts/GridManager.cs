@@ -101,6 +101,25 @@ public class GridManager : MonoBehaviour
         //then proceed to check adjacent tiles
     }
 
+    public int[] CountRocks() //returns count of blue rocks, red rocks, neutral rocks. Not optimal but theres like 50 tiles so it's probably fine
+    {
+        int redSum = 0;
+        int blueSum = 0;
+        int neutralSum = 0;
+        foreach(var tilePos in tilePositions.Keys)
+        {
+            if(GetTileType(tilePos) == TileType.RedRock)
+            {
+                redSum++;
+            }
+            if (GetTileType(tilePos) == TileType.BlueRock)
+                blueSum++;
+            if (GetTileType(tilePos) == TileType.NeutralRock)
+                neutralSum++;
+        }
+        return new int[] { redSum, blueSum, neutralSum };
+    }
+
     public void AddBomb(GameObject floorHitter) //it now has a bomb!
     {
         floorHitter.GetComponent<Tile>().hasBomb = true;
