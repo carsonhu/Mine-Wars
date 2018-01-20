@@ -20,8 +20,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4058839851391764}
   - component: {fileID: 212634249744627250}
-  - component: {fileID: 114626541866543392}
   - component: {fileID: 61702160494742054}
+  - component: {fileID: 114464660847500386}
   m_Layer: 0
   m_Name: BeguileCard
   m_TagString: Untagged
@@ -36,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1081610187767060}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5, y: 0, z: 0}
+  m_LocalPosition: {x: -11.16, y: -0.19, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_Children: []
   m_Father: {fileID: 0}
@@ -67,7 +67,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 24, y: 24}
   m_EdgeRadius: 0
---- !u!114 &114626541866543392
+--- !u!114 &114464660847500386
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
