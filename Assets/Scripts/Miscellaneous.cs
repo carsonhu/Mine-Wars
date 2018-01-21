@@ -7,7 +7,7 @@ public static class Miscellaneous {
     private static System.Random rng = new System.Random();
 
     /// <summary>
-    /// Shuffle a list
+    /// Shuffle a list!
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="list"></param>

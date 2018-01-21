@@ -27,41 +27,58 @@ public class GameManager : MonoBehaviour {
     GameObject p1Menu;
     GameObject p2Menu;
 
+    DeckManager deck;
+
     //these variables are used for preparation stage
     int piecesLeft;
     int bombsLeft;
     int nBombsLeft;
 
-    /// <summary>
-    /// Decrement number of pawns. When it reaches 0, move on to bomb phase.
-    /// </summary>
+    /// <summary>Decrement number of pawns. When it reaches 0, move on to bomb phase. </summary>
     public void decrementPieces()
     {
         piecesLeft--;
         if (piecesLeft == 0)
-            currentPhase = Phase.Bombs;
+            SetPhase(Phase.Bombs);
     }
 
-    /// <summary>
-    /// Decrement number of bombs. When it reaches 0, move on to neutral bombs phase.
-    /// </summary>
+    /// <summary> Decrement number of bombs. When it reaches 0, move on to neutral bombs phase.</summary>
     public void decrementBombs()
     {
         bombsLeft--;
         if (bombsLeft == 0)
-            currentPhase = Phase.NeutralBombs;
+            SetPhase(Phase.NeutralBombs);
     }
 
     public void decrementNeutralBombs()
     {
-        nBombsLeft--;
+        nBombsLeft--; //TODO/NOTE: THIS IS CURRENTLY BUGGED B/C OF DEBOUNCING: CLICKING WILL USUALLY LEAD TO 2 BOMBS BEING PLACED HERE. PROBABLY NOT A PROBLEM ONCE WE INCLUDE TURN-SEPARATING WINDOWS
         if (nBombsLeft == 0)
         {
-            currentPhase = Phase.Game;
+            SetPhase(Phase.Game);
             Debug.Log("Game started");
         }
     }
 
+    /// <summary> Sets current game phase. </summary>
+    /// <param name="phase">Game phase to set to</param>
+    void SetPhase(Phase phase)
+    {
+        if(currentPhase == Phase.NeutralBombs && phase == Phase.Game) //upon game start, each player draws 3 cards.
+        {
+            HandManager hm1 = p1Menu.transform.GetChild(0).GetComponent<HandManager>();
+            HandManager hm2 = p2Menu.transform.GetChild(0).GetComponent<HandManager>();
+            for(int i =0; i < 3; i++)
+            {
+                deck.DrawCard(hm1);
+                deck.DrawCard(hm2);
+            }
+        }
+        currentPhase = phase;
+    }
+    
+    /// <summary>Get current game phase. </summary>
+    /// <returns>Current Game Phase</returns>
     public Phase getPhase()
     {
         return currentPhase;
@@ -86,21 +103,19 @@ public class GameManager : MonoBehaviour {
         p2Menu = Instantiate(playerMenu2) as GameObject;
         p2Menu.GetComponent<PlayerMenu>().InitPlayer(Team.Blue);
 
+        deck = GameObject.FindGameObjectWithTag("Deck").GetComponent<DeckManager>();
+
         InitGame();
     }
 
-    /// <summary>
-    /// Set up grid and start game
-    /// </summary>
+    /// <summary> Set up grid and start game </summary>
     void InitGame()
     {
         gridScript.SetupScene();
         StartGame();
     }
 
-/// <summary>
-/// Initializes # of pieces, # of bombs, # of neutral bombs
-/// </summary>
+    /// <summary>Initializes # of pieces, # of bombs, # of neutral bombs</summary>
     void StartGame()
     {
         piecesLeft = 10; //players will place all their dudes
@@ -117,9 +132,25 @@ public class GameManager : MonoBehaviour {
         int redAP = (playersTurn == Team.Red) ? 3 : 0;
         int blueAP = (playersTurn == Team.Blue) ? 3 : 0;
 
-        p1Menu.GetComponent<PlayerMenu>().SetAP(redAP);
+        HandManager hm1 = p1Menu.transform.GetChild(0).GetComponent<HandManager>();
+        HandManager hm2 = p2Menu.transform.GetChild(0).GetComponent<HandManager>();
+
+        p1Menu.GetComponent<PlayerMenu>().SetAP(redAP); //setting action points
         p2Menu.GetComponent<PlayerMenu>().SetAP(blueAP);
 
+        bool redActive = (playersTurn == Team.Red) ? true : false; //make hand inactive upon turn change
+        hm1.ToggleHand(redActive);
+        hm2.ToggleHand(!redActive);
+
+        if (currentPhase == Phase.Game) //drawing card on turn start
+        {
+            if (playersTurn == Team.Red)
+                deck.DrawCard(hm1);
+            else
+                deck.DrawCard(hm2);
+        }
+
+        //Victory check (rocks)
         int[] rocks = gridScript.CountRocks(); //rocks[0] is red, rocks[1] is blue
         if (rocks[0] == 0 && rocks[1] != 0)
             Debug.Log("Blue wins!");
@@ -132,6 +163,8 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+
+        //Victory check (pawns)
 		if(currentPhase == Phase.Game && gridScript.redPawns.Count == 0)
         {
             Debug.Log("Blue wins!");

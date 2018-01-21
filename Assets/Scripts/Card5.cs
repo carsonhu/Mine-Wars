@@ -13,8 +13,6 @@ public class Card5 : PlayerCard {
     //then restore control to player menu
 
     private CardPhase currentPhase;
-//    private bool isInCharge = false; //tells the player menu that this card is in charge now. We probably move this stuff to the hand manager?
-    GridManager gm;
     GameObject pawn1;
     GameObject pawn2;
 
@@ -32,7 +30,7 @@ public class Card5 : PlayerCard {
     /// <param name="gm">grid manager</param>
     /// <param name="pm">player menu</param>
     /// <returns>theoretically you need to return whether it applied</returns>
-    public override bool applyEffect(GridManager gm, PlayerMenu pm) //click behavior
+    public override bool applyEffect() //click behavior
     {
         Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
         RaycastHit2D playerHitter = Physics2D.Raycast(rayPos, Vector2.zero, 0f, LayerMask.GetMask("UnitsLayer"));
@@ -40,11 +38,11 @@ public class Card5 : PlayerCard {
         if (currentPhase == CardPhase.phase1 && gm.IsIlluminated(floorHitter.transform.position) && playerHitter) //click a pawn
         {
             pawn1 = playerHitter.transform.gameObject;
-            TogglePhase(CardPhase.phase2, gm, pm);
+            TogglePhase(CardPhase.phase2);
         }
         if (currentPhase == CardPhase.phase2 && gm.IsIlluminated(floorHitter.transform.position) && playerHitter) //highlight other pawns
         {
-            TogglePhase(CardPhase.action, gm, pm);
+            TogglePhase(CardPhase.action);
             pawn2 = playerHitter.transform.gameObject;
             Vector3 tempPosition = pawn2.transform.position;
             pawn2.transform.position = pawn1.transform.position;
@@ -52,13 +50,8 @@ public class Card5 : PlayerCard {
         }
         return true;
     }
-    void RestorePM(PlayerMenu pm)
-    {
-        if (!pm.enabled)
-            pm.enabled = true;
-    }
 
-    void TogglePhase(CardPhase phase, GridManager gm, PlayerMenu pm)
+    void TogglePhase(CardPhase phase)
     {
         currentPhase = phase;
         if (phase == CardPhase.phase1) //highlight all allied units
@@ -75,7 +68,8 @@ public class Card5 : PlayerCard {
         else if (phase == CardPhase.action)
         {
             gm.DellumPositions();
-            RestorePM(pm);
+            RestorePM();
+            hm.DiscardCard(this.gameObject);
         }
     }
 
@@ -84,39 +78,41 @@ public class Card5 : PlayerCard {
      //  GameObject GameController = GameObject.FindGameObjectWithTag("GameController");
         GameManager gam = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-        PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
-        if (pm.enabled && (pm.playerSide == gam.playersTurn)) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
+        pm = transform.parent.parent.GetComponent<PlayerMenu>();
+        hm = transform.parent.GetComponent<HandManager>();
+        if (gam.getPhase() == Phase.Game && pm.enabled && (pm.playerSide == gam.playersTurn) && hm.GetCardInCharge() == null) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
         {
-            //isInCharge = true;
             pm.enabled = false;
-            TogglePhase(CardPhase.phase1, gm, pm);
+            hm.SetCardInCharge(this.gameObject);
+            TogglePhase(CardPhase.phase1);
         }
     }
 
 private void Start()    //THIS IS TEMPORARY SO THAT BOTH PLAYERS' BUTTONS ARENT JUST IN THE SAME PLACE
 {
-   PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
-   if(pm.GetPlayerSide() == Team.Blue)
-   {
-       transform.position = transform.position + new Vector3(0, 7, 0);
-   }
+ /*
+        PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
+        if (pm.GetPlayerSide() == Team.Blue)
+        {
+            transform.position = transform.position + new Vector3(0, 7, 0);
+        }*/
 }
 
 // Update is called once per frame
 void Update () {
-
-
         if (GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().getPhase() == Phase.Game)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (transform.parent.GetComponent<HandManager>().GetCardInCharge() == this.gameObject) //if this is in charge, gm,pm, and hm, have surely been set
             {
-                GridManager gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-                PlayerMenu pm = transform.parent.parent.GetComponent<PlayerMenu>();
-                applyEffect(gm, pm);
-            }
-            if (Input.GetMouseButtonDown(1))
-            {
-                TogglePhase(CardPhase.action, GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>(), transform.parent.GetComponent<PlayerMenu>());
+                if (Input.GetMouseButtonDown(0))
+                {
+                    applyEffect();
+                }
+                if (Input.GetMouseButtonDown(1)) //if we want to cancel, we don't want to go to togglePhase b/c we want to keep the card
+                {
+                    gm.DellumPositions();
+                    RestorePM();
+                }
             }
         }
 }

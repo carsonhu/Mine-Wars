@@ -14,6 +14,7 @@ public class Tile : MonoBehaviour {
     public bool hasBomb = false; //is there a bomb
     public Team affiliation; //Neutral, Blue, Red
 
+    /// <summary>Highlight tile: Plain = green, Rock = red, other = white</summary>
     public void HighlightTile(Highlight highlight)
     {
         if (highlight == Highlight.Plain)
@@ -24,6 +25,7 @@ public class Tile : MonoBehaviour {
             GetComponent<SpriteRenderer>().color = Color.white;
     }
 
+    /// <summary>Set tile to type specified by string. If tile has bomb, bomb will explode</summary>
     public void SetTile(string type)
     {
         if (!hasBomb)

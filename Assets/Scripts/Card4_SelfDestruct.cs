@@ -13,7 +13,7 @@ public class Card4_SelfDestruct : PlayerCard {
 
     private CardPhase currentPhase;
     private bool isInCharge = false; //tells the player menu that this card is in charge now. We probably move this stuff to the hand manager?
-    GridManager gm;
+ //   GridManager gm;
     GameObject pawn1;
 
     private enum CardPhase
@@ -21,7 +21,7 @@ public class Card4_SelfDestruct : PlayerCard {
         phase1, action
     }
 
-    public override bool applyEffect(GridManager gm, PlayerMenu pm) {
+    public override bool applyEffect() {
         // Need to highlight the spots of all the pawns the current player owns
         // Destroys everything adjacent to the selected pawn
 
@@ -31,7 +31,7 @@ public class Card4_SelfDestruct : PlayerCard {
         if (currentPhase == CardPhase.phase1 && gm.IsIlluminated(floorHitter.transform.position) && playerHitter) //click a pawn
         {
             pawn1 = playerHitter.transform.gameObject;
-            TogglePhase(CardPhase.action, gm, pm);
+            TogglePhase(CardPhase.action);
         }
         if (currentPhase == CardPhase.action) //highlight other pawns
         {
@@ -46,17 +46,7 @@ public class Card4_SelfDestruct : PlayerCard {
         return true;
     }
 
-    void RestorePM(PlayerMenu pm)
-    {
-        if (isInCharge)
-        {
-            isInCharge = false;
-            if (!pm.enabled)
-                pm.enabled = true;
-        }
-    }
-
-    void TogglePhase(CardPhase phase, GridManager gm, PlayerMenu pm)
+    void TogglePhase(CardPhase phase)
     {
         currentPhase = phase;
         if (phase == CardPhase.phase1) //highlight all allied units
@@ -67,7 +57,8 @@ public class Card4_SelfDestruct : PlayerCard {
         else if (phase == CardPhase.action)
         {
             gm.DellumPositions();
-            RestorePM(pm);
+            RestorePM();
+            hm.DiscardCard(this.gameObject);
         }
     }
 
@@ -76,37 +67,43 @@ public class Card4_SelfDestruct : PlayerCard {
      //  GameObject GameController = GameObject.FindGameObjectWithTag("GameController");
         GameManager gam = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-        PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
-        if (!isInCharge && pm.enabled && (pm.playerSide == gam.playersTurn)) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
+        pm = transform.parent.parent.GetComponent<PlayerMenu>();
+        hm = transform.parent.GetComponent<HandManager>();
+        if (gam.getPhase() == Phase.Game && pm.enabled && (pm.playerSide == gam.playersTurn) && hm.GetCardInCharge() == null) //currently just checks player menu. We probably add something to handmanager to make sure u cant click other cards
         {
-            isInCharge = true;
             pm.enabled = false;
-            TogglePhase(CardPhase.phase1, gm, pm);
+            hm.SetCardInCharge(this.gameObject);
+            TogglePhase(CardPhase.phase1);
         }
     }
 
     private void Start()    //THIS IS TEMPORARY SO THAT BOTH PLAYERS' BUTTONS ARENT JUST IN THE SAME PLACE
     {
+        /*
         PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
         if (pm.GetPlayerSide() == Team.Blue)
         {
             transform.position = transform.position + new Vector3(0, 7, 0);
-        }
+        }*/
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && isInCharge)
+        if (GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().getPhase() == Phase.Game)
         {
-            GridManager gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-            PlayerMenu pm = transform.parent.GetComponent<PlayerMenu>();
-            applyEffect(gm, pm);
+            if (transform.parent.GetComponent<HandManager>().GetCardInCharge() == this.gameObject)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    applyEffect();
+                }
+                if (Input.GetMouseButtonDown(1))
+                {
+                    gm.DellumPositions();
+                    RestorePM();
+                }
+            }
         }
-        if (Input.GetMouseButtonDown(1))
-        {
-            TogglePhase(CardPhase.action, GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>(), transform.parent.GetComponent<PlayerMenu>());
-        }
-
     }
 }

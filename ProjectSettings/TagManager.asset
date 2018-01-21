@@ -10,6 +10,7 @@ TagManager:
   - rock
   - plain
   - Canvas
+  - Deck
   layers:
   - Default
   - TransparentFX

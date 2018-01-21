@@ -8,18 +8,17 @@ public class GridManager : MonoBehaviour
     private int rows = 6;
     private int columns = 9;
 
-    public Dictionary<Vector3, GameObject> tilePositions = new Dictionary<Vector3, GameObject>();
+    public Dictionary<Vector3, GameObject> tilePositions = new Dictionary<Vector3, GameObject>(); //map: pos -> tile
     public List<GameObject> redPawns = new List<GameObject>();
     public List<GameObject> bluePawns = new List<GameObject>();
-  //  private List<GameObject> tiles = new List<GameObject>();
-    public Sprite[] sprites; //list of sprites. Sprites[0] is plains, sprites[1] is rocks
-    public Transform boardHolder;
+    public Transform boardHolder; //A gameobject to hold all the tiles.
 
     private List<Vector3> gridPositions = new List<Vector3>(); //we use this to get a list of empty grid positions
-    List<Vector3> illuminatedPositions = new List<Vector3>();
+    List<Vector3> illuminatedPositions = new List<Vector3>(); //A list of all currently illuminated positions
     public int GetColumns() { return columns; }
     public int GetRows() { return rows; }
 
+    /// <summary>Initializes GridPositions, which is used for making the board </summary>
     void InitializeList()
     {
         gridPositions.Clear();
@@ -32,6 +31,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    /// <summary>Initializes Tile Positions, a map from coordinate to tile located at that coord. </summary>
     void InitTilePositions()
     {
         foreach(Transform child in boardHolder)
@@ -45,6 +45,8 @@ public class GridManager : MonoBehaviour
         boardHolder = new GameObject("Board").transform;
     }
 
+    /// <summary>get a random pos. used for making the board.</summary>
+    /// <returns>a random pos</returns>
     Vector3 RandomPosition()
     {
         int randomIndex = Random.Range(0, gridPositions.Count);
@@ -53,6 +55,9 @@ public class GridManager : MonoBehaviour
         return randomPosition;
     }
 
+    /// <summary>Lay out X objects at random. used for making the board.</summary>
+    /// <param name="tile">Tile to lay out.</param>
+    /// <param name="count">Number of tiles to lay out.</param>
     void LayoutObjectAtRandom(string tile, int count)
     {
         for(int i = 0; i < count; i++)
@@ -67,6 +72,10 @@ public class GridManager : MonoBehaviour
         }
     }
     
+    /// <summary> Check if a particular type of object is adjacent to the specified position.</summary>
+    /// <param name="tag">TileType of object</param>
+    /// <param name="pos">specified position</param>
+    /// <returns></returns>
     public bool IsAdjacentToObject(TileType tag, Vector3 pos)
     {
         if (GetTileType(pos + Vector3.right) == tag || GetTileType(pos + Vector3.left) == tag || GetTileType(pos + Vector3.down) == tag || GetTileType(pos + Vector3.up) == tag)
@@ -75,6 +84,8 @@ public class GridManager : MonoBehaviour
             return false;
     }
 
+    /// <summary> Helper function for exploding bombs. Helps explode a space.</summary>
+    /// <param name="pos"></param>
     private void _ActivateBombHelper(Vector3 pos)
     {
         if (tilePositions.ContainsKey(pos))
@@ -84,12 +95,13 @@ public class GridManager : MonoBehaviour
             {
                 RemovePawn(coll.gameObject);
             }
-            tilePositions[pos].GetComponent<Tile>().SetTile("plain");
-      //      tilePositions[pos].GetComponent<Tile>().RemoveBomb();
+            tilePositions[pos].GetComponent<Tile>().SetTile("plain"); //SetTile(plain) will trigger a bomb if the tile has one.
         }
     }
 
-    public void ActivateBomb(Vector3 pos) //set tile, and tiles adjacent to it, to plain.
+    /// <summary>Trigger a bomb by setting a tile, and tiles adjacent to it, to plains.</summary>
+    /// <param name="pos">Position of tile to bomb</param>
+    public void ActivateBomb(Vector3 pos)
     {
         if (tilePositions[pos].GetComponent<Tile>().hasBomb) {
             tilePositions[pos].GetComponent<Tile>().RemoveBomb();
@@ -98,10 +110,11 @@ public class GridManager : MonoBehaviour
             _ActivateBombHelper(pos + Vector3.left);
             _ActivateBombHelper(pos + Vector3.up);
       }
-        //then proceed to check adjacent tiles
     }
 
-    public int[] CountRocks() //returns count of blue rocks, red rocks, neutral rocks. Not optimal but theres like 50 tiles so it's probably fine
+    /// <summary>Returns count of red rocks, blue rocks, and neutral rocks. </summary>
+    /// <returns>int array: [#red rocks, #blue rocks, #neutral rocks]</returns>
+    public int[] CountRocks() //Not optimal but theres like 50 tiles so it's probably fine
     {
         int redSum = 0;
         int blueSum = 0;
@@ -109,9 +122,7 @@ public class GridManager : MonoBehaviour
         foreach(var tilePos in tilePositions.Keys)
         {
             if(GetTileType(tilePos) == TileType.RedRock)
-            {
                 redSum++;
-            }
             if (GetTileType(tilePos) == TileType.BlueRock)
                 blueSum++;
             if (GetTileType(tilePos) == TileType.NeutralRock)
@@ -120,11 +131,16 @@ public class GridManager : MonoBehaviour
         return new int[] { redSum, blueSum, neutralSum };
     }
 
+    /// <summary>Add a bomb to a tile.</summary>
+    /// <param name="floorHitter">Tile to add bomb to</param>
     public void AddBomb(GameObject floorHitter) //it now has a bomb!
     {
         floorHitter.GetComponent<Tile>().hasBomb = true;
     }
 
+    /// <summary>Add pawn to a position.</summary>
+    /// <param name="affiliation">Team pawn belongs to</param>
+    /// <param name="position">Position to add pawn on</param>
     public void AddPawn(Team affiliation, Vector3 position)
     {
         GameObject thePawn = Resources.Load("Pawn") as GameObject;
@@ -142,6 +158,8 @@ public class GridManager : MonoBehaviour
             redPawns.Add(realPawn);
     }
 
+    /// <summary>Destroy a pawn.</summary>
+    /// <param name="obj">Pawn to destroy</param>
     public void RemovePawn(GameObject obj)
     {
         bluePawns.Remove(obj);
