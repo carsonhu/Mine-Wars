@@ -15,7 +15,9 @@ public class DeckManager : MonoBehaviour {
         TransferCard(card4, true);
         for (int i = 0; i < 10; i++)
         {
-            GameObject card5 = Instantiate(Resources.Load("Cards/BeguileCard") as GameObject) as GameObject;
+      //      GameObject card2 = Instantiate(Resources.Load("Cards/DynamiteTrailCard") as GameObject) as GameObject;
+      //      TransferCard(card2, true);
+              GameObject card5 = Instantiate(Resources.Load("Cards/BeguileCard") as GameObject) as GameObject;
             TransferCard(card5, true);
         }
 	//	deck.Add(new Card4_SelfDestruct());

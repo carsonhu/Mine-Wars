@@ -195,8 +195,42 @@ public class GridManager : MonoBehaviour
 		IllumPosition(pos + Vector3.down, color);
 	}
 
-	// Highlights the given team with the given color.
-	public void IllumTeam(Team t, Highlight color) {
+    //For use of card 4: Highlights in target direction until hitting a rock or enemy player
+    void IllumDirection(Vector3 pos, Vector3 direction, int length)
+    {
+        while (length > 0) //if tile is empty, higlight. if it's a rock, stop.
+        {
+            TileType tile = GetTileType(pos);
+            if (tile != TileType.Empty) //if it's a rock or null we're done
+                length = 0;
+            else //if it's an empty tile
+            {
+                GameObject pawn = GetPawnAtPos(pos); //get the pawn at that position
+                Highlight toHiglight = Highlight.Plain;
+                if (pawn != null)  //we highlight this position, then we're done
+                {
+                    length = 1;
+                    toHiglight = Highlight.Rock;
+                }
+                IllumPosition(pos, toHiglight);
+                pos = pos + direction;
+                length--;
+            }
+        }
+    }
+
+    public void IllumDirections(Vector3 pos, int length)
+    {
+        IllumDirection(pos + Vector3.up, Vector3.up, length);
+        IllumDirection(pos + Vector3.left, Vector3.left, length);
+        IllumDirection(pos + Vector3.right, Vector3.right, length);
+        IllumDirection(pos + Vector3.down, Vector3.down, length);
+    }
+
+
+
+    // Highlights the given team with the given color.
+    public void IllumTeam(Team t, Highlight color) {
 		List<GameObject> team_list = (t == Team.Red) ? redPawns : bluePawns;
 		foreach (GameObject pawn in team_list) {
 			IllumPosition (pawn.transform.position, color);
@@ -222,6 +256,15 @@ public class GridManager : MonoBehaviour
         illuminatedPositions.Clear();
     }
 
+    public GameObject GetPawnAtPos(Vector3 pos) //returns a pawn at a particular location, if there is one
+    {
+        RaycastHit2D playerHitter = Physics2D.Raycast(pos, Vector2.zero, 0f, LayerMask.GetMask("UnitsLayer"));
+        if (playerHitter)
+            return playerHitter.transform.gameObject;
+        else
+            return null;
+    }
+
 	public TileType GetTileType(Vector3 pos) {
 		if (!tilePositions.ContainsKey (pos)) {
 			return TileType.NullTile;
@@ -231,12 +274,8 @@ public class GridManager : MonoBehaviour
 		} else if (tilePositions [pos].tag == "redRock") {
 			return TileType.RedRock;
 		} else if (tilePositions [pos].tag == "blueRock") {
-			return TileType.BlueRock;
-		} else if (tilePositions [pos].tag == "redPawn") {  // TODO: this may be wrong.
-			return TileType.RedPawn;
-		} else if (tilePositions [pos].tag == "bluePawn") {
-			return TileType.BluePawn;
-		} else if (tilePositions [pos].tag == "rock") {
+			return TileType.BlueRock; //pawns can't be under the tiletype
+        }  else if (tilePositions [pos].tag == "rock") {
 			return TileType.NeutralRock;	
 		} else {
 			return TileType.NullTile;
