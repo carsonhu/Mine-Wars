@@ -8,21 +8,23 @@ public class PlayerMenu : MonoBehaviour {
     GameManager gameManager;
     GameObject cursorObject; //this is the semi-transparent dude
     GridManager gridManager;
+    DeckManager deck;
     private bool movementMode = false;
     private GameObject activeObject;
     public int actionPoints;
     bool turnPanelOpen = false;
     GameObject turnPanel;
     //we'll have a variable referencing playerCards
-    
 
-	// Use this for initialization
-	void Start () {
+
+    // Use this for initialization
+    void Start() {
         actionPoints = 0;
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         gridManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
-	}
-	
+        deck = GameObject.FindGameObjectWithTag("Deck").GetComponent<DeckManager>();
+    }
+
     /// <summary>
     /// Initialize a pawn. Give them a side too.
     /// </summary>
@@ -31,9 +33,12 @@ public class PlayerMenu : MonoBehaviour {
     {
         playerSide = side;
         Debug.Log("Player side:" + playerSide);
+        
     }
 
-    public Team GetPlayerSide(){ return playerSide;    }
+    public Team GetPlayerSide() { return playerSide; }
+    public Team GetNotPlayerSide() { return (playerSide == Team.Red) ? Team.Blue : Team.Red;}
+
 
     /// <summary>
     /// Set action points.
@@ -45,7 +50,7 @@ public class PlayerMenu : MonoBehaviour {
     }
 
     /// <summary>
-    /// Destory a rock.
+    /// Destroy a rock.
     /// </summary>
     /// <param name="obj">the rock</param>
     public void DestroyObject(GameObject activeO, GameObject obj)
@@ -53,6 +58,7 @@ public class PlayerMenu : MonoBehaviour {
         obj.GetComponent<Tile>().SetTile("plain");
         if(activeO != null)
             activeO.GetComponent<Pawn>().MoveTo(obj.transform.position);
+        deck.DrawCard(GetComponentInChildren<HandManager>());
         actionPoints -= 2;
     }
 
@@ -66,7 +72,7 @@ public class PlayerMenu : MonoBehaviour {
             obj.GetComponent<Tile>().SetTile("redRock");
         else
             obj.GetComponent<Tile>().SetTile("blueRock");
-      //  activeObject.GetComponent<Pawn>().MoveTo(obj.transform.position);
+        deck.DrawCard(GetComponentInChildren<HandManager>());
         actionPoints -= 3;
     }
 

@@ -13,7 +13,7 @@ public class GridManager : MonoBehaviour
     public List<GameObject> bluePawns = new List<GameObject>();
     public Transform boardHolder; //A gameobject to hold all the tiles.
 
-    private List<Vector3> gridPositions = new List<Vector3>(); //we use this to get a list of empty grid positions
+    List<Vector3> gridPositions = new List<Vector3>(); //we use this to get a list of empty grid positions
     List<Vector3> illuminatedPositions = new List<Vector3>(); //A list of all currently illuminated positions
     public int GetColumns() { return columns; }
     public int GetRows() { return rows; }
@@ -167,6 +167,44 @@ public class GridManager : MonoBehaviour
         Destroy(obj);
     }
 
+    /// <summary>
+    /// Primarily for use with Card 6: mislead. Changes a pawn's team.
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="team"></param>
+    public void AlterPawn(GameObject obj, Team team)
+    {
+        bluePawns.Remove(obj);
+        redPawns.Remove(obj);
+        if (team == Team.Red)
+        {
+            redPawns.Add(obj);
+            obj.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/redPawn");
+        }
+        else
+        {
+            bluePawns.Add(obj);
+            obj.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/bluePawn");
+        }
+    }
+
+    /// <summary>
+    /// Get the side the pawn is on
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public Team GetPawnSide(GameObject obj)
+    {
+        if (redPawns.Contains(obj))
+            return Team.Red;
+        if (bluePawns.Contains(obj))
+            return Team.Blue;
+        else
+            return Team.Neutral;
+    }
+
+
+
     public void SetupScene()
     {
         BoardSetup();
@@ -177,6 +215,7 @@ public class GridManager : MonoBehaviour
         LayoutObjectAtRandom("rock", 15);
         InitTilePositions();
     }
+
 
 	// The following are PURE UTILITY FUNCTIONS and should NOT contain any logic pertaining to types of objects
 	// and different colors. That sort of logic should go in HIGHER level functions that call
@@ -243,6 +282,11 @@ public class GridManager : MonoBehaviour
         {
             IllumPosition(pos, color);
         }
+    }
+
+    public int IlluminatedPositionsCount()
+    {
+        return illuminatedPositions.Count;
     }
 
     public bool IsIlluminated(Vector3 pos) { return illuminatedPositions.Contains(pos); }

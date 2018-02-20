@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour {
 
     public Phase currentPhase = Phase.Pawns; //
 
+    public List<GameObject> misledPawns = new List<GameObject>(); //for use with mislead
+    public void AddMisledPawn(GameObject pawn) { misledPawns.Add(pawn); }
+
     GameObject p1Menu;
     GameObject p2Menu;
 
@@ -149,6 +152,17 @@ public class GameManager : MonoBehaviour {
             else
                 deck.DrawCard(hm2);
         }
+        
+        foreach(GameObject pawn in misledPawns) //handle pawns whose side has changed due to the [MISLEAD] card
+        {
+            if(pawn != null)
+            {
+                Team pawnSide = gridScript.GetPawnSide(pawn);
+                Team pawnSideNew = (pawnSide == Team.Red) ? Team.Blue : Team.Red;
+                gridScript.AlterPawn(pawn, pawnSideNew);
+            }
+        }
+        misledPawns.Clear();
 
         //Victory check (rocks)
         int[] rocks = gridScript.CountRocks(); //rocks[0] is red, rocks[1] is blue

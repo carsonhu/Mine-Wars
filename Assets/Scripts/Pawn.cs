@@ -13,13 +13,13 @@ public class Pawn : MonoBehaviour {
     private Rigidbody2D rb2D; //rigidbody of the object
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
         inverseMoveTime = 1f / moveTime;
     }
 
-    IEnumerator SmoothMovement(Vector3 end)
+    public IEnumerator SmoothMovement(Vector3 end)
     {
         float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
         while (sqrRemainingDistance > float.Epsilon)

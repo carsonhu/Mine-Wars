@@ -11,18 +11,47 @@ public class DeckManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         // TODO: create copies of each card 
+
+        int copies = 3;
+        for(int i =0; i < copies; i++)
+        {
+            AddCard("BeguileCard");
+            AddCard("GuidingRopeCard");
+            AddCard("MisleadCard");
+            AddCard("SelfDestructCard");
+            AddCard("DynamiteTrailCard");
+        }
+
+        Miscellaneous.Shuffle<GameObject>(deck);
+
+        /*
         GameObject card4 = Instantiate(Resources.Load("Cards/SelfDestructCard") as GameObject) as GameObject;
         TransferCard(card4, true);
         for (int i = 0; i < 10; i++)
         {
-      //      GameObject card2 = Instantiate(Resources.Load("Cards/DynamiteTrailCard") as GameObject) as GameObject;
-      //      TransferCard(card2, true);
-              GameObject card5 = Instantiate(Resources.Load("Cards/BeguileCard") as GameObject) as GameObject;
-            TransferCard(card5, true);
-        }
+            //       GameObject card2 = Instantiate(Resources.Load("Cards/DynamiteTrailCard") as GameObject) as GameObject;
+            //       TransferCard(card2, true);
+            //         GameObject card5 = Instantiate(Resources.Load("Cards/BeguileCard") as GameObject) as GameObject;
+            //       TransferCard(card5, true);
+            // GameObject card8 = Instantiate(Resources.Load("Cards/GuidingRopeCard") as GameObject) as GameObject;
+            //TransferCard(card8, true);
+            GameObject card6 = Instantiate(Resources.Load("Cards/MisleadCard") as GameObject) as GameObject;
+            TransferCard(card6, true);
+        }*/
 	//	deck.Add(new Card4_SelfDestruct());
 	//	deck.Add (new Card5 ());
 	}
+
+    /// <summary>
+    /// Adds a card to the deck
+    /// </summary>
+    /// <param name="name">Name of card in inspector</param>
+    void AddCard(string name)
+    {
+        GameObject card = Instantiate(Resources.Load("Cards/" + name) as GameObject) as GameObject;
+        TransferCard(card, true);
+    }
+
 
     /// <summary> Transfers a card to deck or graveyard</summary>
     /// <param name="card">Card to transfer</param>

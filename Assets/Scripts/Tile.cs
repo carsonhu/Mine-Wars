@@ -49,6 +49,15 @@ public class Tile : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Copies the specified tile
+    /// </summary>
+    /// <param name="tile"></param>
+    public void CopyTile(GameObject tile)
+    {
+        
+    }
+
     public void RemoveBomb()
     {
         hasBomb = false;

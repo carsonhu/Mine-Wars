@@ -51,6 +51,15 @@ public abstract class PlayerCard : MonoBehaviour {
             firstAction();
         }
     }
+  
+    /// <summary>
+    /// what to do when you need to undo
+    /// </summary>
+    public void CancelCard()
+    {
+        gm.DellumPositions();
+        RestorePM();
+    }
 
     public void Update()
     {
@@ -64,8 +73,7 @@ public abstract class PlayerCard : MonoBehaviour {
                 }
                 if (Input.GetMouseButtonDown(1)) //if we want to cancel, we don't want to go to togglePhase b/c we want to keep the card
                 {
-                    gm.DellumPositions();
-                    RestorePM();
+                    CancelCard();
                 }
             }
         }

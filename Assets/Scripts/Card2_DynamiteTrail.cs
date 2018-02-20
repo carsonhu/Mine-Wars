@@ -37,29 +37,40 @@ public class Card2_DynamiteTrail : PlayerCard {
         {
             //Start Coroutine to throw the dynamite
             Vector3 direction = (floorHitter.transform.position - pawn1.transform.position).normalized;
-            GameObject dynamite = Instantiate(Resources.Load("Dynamite") as GameObject) as GameObject;
+            GameObject dynamite = Instantiate(Resources.Load("Dynamite") as GameObject) as GameObject; //NOTE: CURRENTLY ONLY DIFFERENCE BTWN DYNAMITE AND PAWN IS LAYER. May be problem.
             dynamite.transform.position = pawn1.transform.position;
-            ThrowDynamite(direction, dynamite);
-            TogglePhase(CardPhase.action);
+            StartCoroutine(ThrowDynamite(direction, dynamite));
+       //     TogglePhase(CardPhase.action);
         }
         return true;
     }
 
-    void ThrowDynamite(Vector3 dir, GameObject dynamite) //throw dynamite in target direction. If there's a pawn, destroy it and stop. Dynamite is coded as Pawn for now.
+    IEnumerator ThrowDynamite(Vector3 dir, GameObject dynamite) //throw dynamite in target direction. If there's a pawn, destroy it and stop. Dynamite is coded as Pawn for now.
     //note: look at smoothmovements in roguelike to do this
     {
         Vector3 pos = dynamite.transform.position;
         Vector3 nextPos = pos + dir;
+        int r = 3;
         //if highlighted, go. If not, stop.
-      //  while (true)
-      //  {
+        while (r > 0)
+        {
             if (gm.IsIlluminated(nextPos))
             {
-                dynamite.GetComponent<Pawn>().MoveTo(nextPos);
+                yield return StartCoroutine(dynamite.GetComponent<Pawn>().SmoothMovement(nextPos));
             }
+            else
+                break;
             pos = nextPos;
             nextPos = pos + dir;
-     //   }
+            r--;
+            if (gm.GetPawnAtPos(pos))
+            {
+                gm.RemovePawn(gm.GetPawnAtPos(pos));
+                break;
+            }
+        }
+        Destroy(dynamite);
+        TogglePhase(CardPhase.action);
     }
 
     void TogglePhase(CardPhase phase)
