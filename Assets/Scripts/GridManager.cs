@@ -158,6 +158,22 @@ public class GridManager : MonoBehaviour
             redPawns.Add(realPawn);
     }
 
+    /// <summary>Gets the number of pawns for specified team.</summary>
+    /// <param name="affiliation">Team pawn belongs to</param>
+    public int GetPawnCount(Team affiliation)
+    {
+        GameObject thePawn = Resources.Load("Pawn") as GameObject;
+        if (affiliation == Team.Blue)
+            return bluePawns.Count;
+        else if (affiliation == Team.Red)
+            return redPawns.Count;
+        else
+        {
+            Debug.Log("You have entered an invalid Team Affiliation!");
+            return -1; // Need to change this part later.
+        }
+    }
+
     /// <summary>Destroy a pawn.</summary>
     /// <param name="obj">Pawn to destroy</param>
     public void RemovePawn(GameObject obj)
