@@ -11,6 +11,8 @@ TagManager:
   - plain
   - Canvas
   - Deck
+  - NetworkManager
+  - PlayerMenu
   layers:
   - Default
   - TransparentFX

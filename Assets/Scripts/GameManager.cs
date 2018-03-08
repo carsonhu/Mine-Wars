@@ -21,9 +21,10 @@ public class GameManager : MonoBehaviour {
     [HideInInspector]
     public Team playersTurn = Team.Red; //1 or 0
 
+    [HideInInspector]
+    public Phase currentPhase = Phase.Pawns;
 
-    public Phase currentPhase = Phase.Pawns; //
-
+    [HideInInspector]
     public List<GameObject> misledPawns = new List<GameObject>(); //for use with mislead
     public void AddMisledPawn(GameObject pawn) { misledPawns.Add(pawn); }
 

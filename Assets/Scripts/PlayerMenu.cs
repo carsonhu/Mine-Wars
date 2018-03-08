@@ -14,6 +14,7 @@ public class PlayerMenu : MonoBehaviour {
     public int actionPoints;
     bool turnPanelOpen = false;
     GameObject turnPanel;
+    Vector3 OUTOFBOUNDS = new Vector3(9000, 9000, 0);
     //we'll have a variable referencing playerCards
 
 
@@ -23,6 +24,8 @@ public class PlayerMenu : MonoBehaviour {
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         gridManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GridManager>();
         deck = GameObject.FindGameObjectWithTag("Deck").GetComponent<DeckManager>();
+        Debug.Log("My team is: " + playerSide);
+        cursorObject = Instantiate(Resources.Load<GameObject>("EmptySprite")) as GameObject;
     }
 
     /// <summary>
@@ -86,11 +89,24 @@ public class PlayerMenu : MonoBehaviour {
         RaycastHit2D floorHitter = Physics2D.Raycast(rayPos, Vector2.zero, 0f, LayerMask.GetMask("Default"));
         if (gameManager.getPhase() == Phase.Pawns)
         {
-            if(floorHitter && !playerHitter) //
+            if(floorHitter && !playerHitter && canPlacePawn(floorHitter.transform.position)) //show a transparent dude there
             {
-
+             //   Debug.Log(floorHitter.collider.tag);
+                cursorObject.transform.position = floorHitter.transform.position;
+                string pawnType = (playerSide == Team.Red) ? "redPawn" : "bluePawn";
+                cursorObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/" + pawnType);
+                cursorObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+            }
+            else
+            {
+                cursorObject.transform.position = OUTOFBOUNDS;
             }
         }
+    }
+
+    bool canPlacePawn(Vector3 pos)
+    {
+        return (gridManager.GetTileType(pos) == TileType.Empty) && ((GetPlayerSide() == Team.Red && !gridManager.IsAdjacentToObject(TileType.BlueRock, pos)) || (GetPlayerSide() == Team.Blue && !gridManager.IsAdjacentToObject(TileType.RedRock, pos)));
     }
 
     /// <summary>
@@ -108,13 +124,10 @@ public class PlayerMenu : MonoBehaviour {
             //If so, add a pawn on there!
             if (floorHitter && !playerHitter) //we hit a floor
             {
-                if(floorHitter.collider.tag == "plain")
-                {
-                    if ( (GetPlayerSide() == Team.Red && !gridManager.IsAdjacentToObject(TileType.BlueRock, floorHitter.transform.position)) || (GetPlayerSide() == Team.Blue && !gridManager.IsAdjacentToObject(TileType.RedRock, floorHitter.transform.position))){
-                        gridManager.AddPawn(playerSide, floorHitter.transform.position);
-                        gameManager.decrementPieces();
-                        gameManager.TogglePlayerTurn();
-                    }
+                if ( canPlacePawn(floorHitter.transform.position)){
+                    gridManager.AddPawn(playerSide, floorHitter.transform.position);
+                    gameManager.decrementPieces();
+                    gameManager.TogglePlayerTurn();
                 }
             }
         }else if(gameManager.getPhase() == Phase.Bombs) //now we place bombs under rocks
