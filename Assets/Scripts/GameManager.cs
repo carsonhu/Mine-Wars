@@ -128,6 +128,19 @@ public class GameManager : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns the Player Menu of the Current Player
+    /// </summary>
+    public GameObject getPlayerMenu()
+    {
+        if (playersTurn == Team.Red)
+        {
+            return p1Menu;
+        }
+        else
+            return p2Menu;
+    }
+
+    /// <summary>
     /// Toggles player's turn
     /// </summary>
     public void TogglePlayerTurn()
