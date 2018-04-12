@@ -70,44 +70,33 @@ public class PlayerMenu : MonoBehaviour {
     /// </summary>
     public void RevivePawn()
     {
-        if (actionPoints == 3)
-        {
-            if (GetPlayerSide() == Team.Red && gridManager.GetPawnCount(Team.Red) < 5 || GetPlayerSide() == Team.Blue && gridManager.GetPawnCount(Team.Blue) < 5)
-            {
-                TileType enemyRock;
-                if (GetPlayerSide() == Team.Red)
-                    enemyRock = TileType.BlueRock;
-                else
-                    enemyRock = TileType.RedRock;
+        //if (GetPlayerSide() == Team.Red && gridManager.GetPawnCount(Team.Red) < 5 || GetPlayerSide() == Team.Blue && gridManager.GetPawnCount(Team.Blue) < 5)
+        //{
+            TileType enemyRock;
+            if (GetPlayerSide() == Team.Red)
+                enemyRock = TileType.BlueRock;
+            else
+                enemyRock = TileType.RedRock;
 
-                Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-                RaycastHit2D playerHitter = Physics2D.Raycast(rayPos, Vector2.zero, 0f, LayerMask.GetMask("UnitsLayer"));
-                RaycastHit2D floorHitter = Physics2D.Raycast(rayPos, Vector2.zero, 0f, LayerMask.GetMask("Default"));
-                //Check the position to see if it's free (grid-wise and not-grid-wise).
-                //If so, add a pawn on there!
-                if (floorHitter && !playerHitter) //we hit a floor
+            Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+            RaycastHit2D playerHitter = Physics2D.Raycast(rayPos, Vector2.zero, 0f, LayerMask.GetMask("UnitsLayer"));
+            RaycastHit2D floorHitter = Physics2D.Raycast(rayPos, Vector2.zero, 0f, LayerMask.GetMask("Default"));
+            //Check the position to see if it's free (grid-wise and not-grid-wise).
+            //If so, add a pawn on there!
+            if (floorHitter && !playerHitter) //we hit a floor
+            {
+                if (floorHitter.collider.tag == "plain")
                 {
-                    if (floorHitter.collider.tag == "plain")
+                    if (!gridManager.IsAdjacentToObject(enemyRock, floorHitter.transform.position))
                     {
-                        if (!gridManager.IsAdjacentToObject(enemyRock, floorHitter.transform.position))
-                        {
-                            // Might probably consider highlighting the available positions in the future
-                            gridManager.AddPawn(playerSide, floorHitter.transform.position);
-                            Debug.Log("HEROES NEVER DIE!!!!!");
-                        }
+                        // Might probably consider highlighting the available positions in the future
+                        gridManager.AddPawn(playerSide, floorHitter.transform.position);
+                        Debug.Log("HEROES NEVER DIE!!!!!");
+                        actionPoints -= 3;
                     }
                 }
             }
-            else
-            {
-                Debug.Log("You have no one to rez yo! Stop trolling.");
-            }
-            actionPoints -= 3;
-        }
-        else
-        {
-            Debug.Log("You don't have enough action points! :(");
-        }
+        //}
     }
 
     /// <summary>
