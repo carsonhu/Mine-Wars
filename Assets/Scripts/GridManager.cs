@@ -180,6 +180,8 @@ public class GridManager : MonoBehaviour
     {
         bluePawns.Remove(obj);
         redPawns.Remove(obj);
+        GameObject explosion = Instantiate(Resources.Load("ToonExplosion/Prefabs/Explosion", typeof(GameObject)), obj.transform.position, Quaternion.identity) as GameObject;
+        Destroy(explosion, .5f);
         Destroy(obj);
     }
 
