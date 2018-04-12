@@ -206,6 +206,11 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Red wins!");
         }
 
+		SetTurnMessageText ();
+
+	}
+
+	void SetTurnMessageText() {
 		if (playersTurn == Team.Red) {  // TODO
 			// display message saying it is red's turn
 			turnMsgText.text = "Red's Turn";
@@ -222,6 +227,7 @@ public class GameManager : MonoBehaviour {
 		} else if (currentPhase == Phase.Game) {
 			turnMsgText.text += "\nRegular game is in progress!";
 		}
-
 	}
 }
+
+
