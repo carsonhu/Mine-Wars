@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Enum for phases of the game.
@@ -17,6 +18,8 @@ public enum TileType { Empty, RedRock, BlueRock, RedPawn, BluePawn, NeutralRock,
 public class GameManager : MonoBehaviour {
     public static GameManager instance = null;
     public GridManager gridScript;
+	public Text turnMsgText;
+	public GameObject turnMsgObj;
 
     [HideInInspector]
     public Team playersTurn = Team.Red; //1 or 0
@@ -108,6 +111,8 @@ public class GameManager : MonoBehaviour {
         p2Menu.GetComponent<PlayerMenu>().InitPlayer(Team.Blue);
 
         deck = GameObject.FindGameObjectWithTag("Deck").GetComponent<DeckManager>();
+		turnMsgObj = GameObject.FindGameObjectWithTag ("TurnMsgObj");
+		turnMsgText = turnMsgObj.GetComponentInChildren<Text> ();
 
         InitGame();
     }
@@ -125,6 +130,19 @@ public class GameManager : MonoBehaviour {
         piecesLeft = 10; //players will place all their dudes
         bombsLeft = 2;
         nBombsLeft = 2;
+    }
+
+    /// <summary>
+    /// Returns the Player Menu of the Current Player
+    /// </summary>
+    public GameObject getPlayerMenu()
+    {
+        if (playersTurn == Team.Red)
+        {
+            return p1Menu;
+        }
+        else
+            return p2Menu;
     }
 
     /// <summary>
@@ -187,5 +205,29 @@ public class GameManager : MonoBehaviour {
         {
             Debug.Log("Red wins!");
         }
+
+		SetTurnMessageText ();
+
+	}
+
+	void SetTurnMessageText() {
+		if (playersTurn == Team.Red) {  // TODO
+			// display message saying it is red's turn
+			turnMsgText.text = "Red's Turn";
+		} else if (playersTurn == Team.Blue) {
+			turnMsgText.text = "Blue's Turn";
+		}
+
+		if (currentPhase == Phase.Pawns) {
+			turnMsgText.text += "\nPlace a pawn.";
+		} else if (currentPhase == Phase.Bombs) {
+			turnMsgText.text += "\nPlace bombs under \nyour team's rocks.";
+		} else if (currentPhase == Phase.NeutralBombs) {
+			turnMsgText.text += "\nPlace bombs under \nneutral rocks.";
+		} else if (currentPhase == Phase.Game) {
+			turnMsgText.text += "\nRegular game is in progress!";
+		}
 	}
 }
+
+
