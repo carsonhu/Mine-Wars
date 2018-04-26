@@ -15,4 +15,15 @@ public class StartMenuScript : MonoBehaviour {
         SceneManager.LoadScene("Multiplayer Lobby", LoadSceneMode.Single);
     }
 
+	public void OnStartOnlineInstructionsBtn()
+	{
+		SceneManager.LoadScene("Instructions Page", LoadSceneMode.Single);
+
+	}
+	public void InstructionsBack()
+	{
+		SceneManager.LoadScene("Title Scene", LoadSceneMode.Single);
+
+	}
+
 }
