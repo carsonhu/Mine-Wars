@@ -47,8 +47,24 @@ public class Card5 : PlayerCard
             TogglePhase(CardPhase.action);
             pawn2 = playerHitter.transform.gameObject;
             Vector3 tempPosition = pawn2.transform.position;
+            // Arrow During Switching of Pawns
+            //===============================================================
+            Vector3 anchorPos = new Vector3(pawn1.transform.position.x, pawn1.transform.position.y, 0);
+            Vector3 currentPos = new Vector3(pawn2.transform.position.x, pawn2.transform.position.y, 0);
+            Vector3 midPointVector = (currentPos + anchorPos) / 2;
+            GameObject Arrow = Instantiate(Resources.Load("Arrow", typeof(GameObject)), midPointVector, Quaternion.identity) as GameObject;
+            Vector3 relative = currentPos - anchorPos;
+            float maggy = relative.magnitude;
+            Arrow.transform.localScale = new Vector3(maggy / 3, 1, 0);
+            Quaternion rotationVector = Quaternion.LookRotation(relative);
+            rotationVector.z = 0;
+            rotationVector.w = 0;
+            Arrow.transform.rotation = rotationVector;
+            //===============================================================
             pawn2.transform.position = pawn1.transform.position;
             pawn1.transform.position = tempPosition;
+            // Destroy Arrow
+            Destroy(Arrow, 1.0f);
         }
         return true;
     }

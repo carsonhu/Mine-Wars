@@ -13,6 +13,7 @@ TagManager:
   - Deck
   - NetworkManager
   - PlayerMenu
+  - TurnMsgObj
   layers:
   - Default
   - TransparentFX
