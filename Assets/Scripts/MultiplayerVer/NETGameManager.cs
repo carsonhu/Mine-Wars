@@ -13,7 +13,9 @@ public class NETGameManager : NetworkBehaviour {
     [HideInInspector]
     public Phase currentPhase = Phase.Pawns;
 
+    [SyncVar]
     GameObject p1Menu;
+    [SyncVar]
     GameObject p2Menu;
 
     //these variables are used for preparation stage
@@ -21,7 +23,7 @@ public class NETGameManager : NetworkBehaviour {
     int bombsLeft;
     int nBombsLeft;
 
-    [SyncVar(hook = "AwakeManager")]
+    [SyncVar(hook = "RpcAwakeManager")]
     bool hasStarted = false;
     NetworkManager networkManager;
 
@@ -86,13 +88,8 @@ public class NETGameManager : NetworkBehaviour {
         networkManager = GameObject.FindGameObjectWithTag("NetworkManager").GetComponent<NetworkManager>();
     }
 
-    private void OnPlayerConnected(NetworkPlayer player)
-    {
-        
-    }
-
-
-    void AwakeManager(bool hasStarted)
+    [ClientRpc]
+    void RpcAwakeManager(bool hasStarted)
     {
         //    GameObject playerMenu1 = Resources.Load("Networking/NETPlayerMenu") as GameObject;
         //    p1Menu = Instantiate(playerMenu1) as GameObject;
@@ -105,14 +102,16 @@ public class NETGameManager : NetworkBehaviour {
 
 
             p1Menu = players[0];
-            p1Menu.GetComponent<NETPlayerMenu>().InitPlayer(Team.Red);
+        //    p1Menu.GetComponent<NETPlayerMenu>().ServerInitPlayer(Team.Red);
             p2Menu = players[1];
-            p2Menu.GetComponent<NETPlayerMenu>().InitPlayer(Team.Blue);
+        //    p2Menu.GetComponent<NETPlayerMenu>().ServerInitPlayer(Team.Blue);
             gridManager = GetComponent<NETGridManager>();
 
             InitGame();
         }
     }
+
+
 
     void InitGame()
     {
@@ -131,7 +130,7 @@ public class NETGameManager : NetworkBehaviour {
     /// <summary>
     /// Toggles player's turn
     /// </summary>
-    public void TogglePlayerTurn()
+    public void RpcTogglePlayerTurn()
     {
         playersTurn = (playersTurn == Team.Red) ? Team.Blue : Team.Red;
         int redAP = (playersTurn == Team.Red) ? 3 : 0;

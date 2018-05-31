@@ -5,12 +5,18 @@ using UnityEngine.Networking;
 
 public class NETPlayerMenu : NetworkBehaviour {
 
+    //[SyncVar(hook = "OnPlayerSide")]
+
     [SyncVar]
     public Team playerSide;
     NETGameManager gameManager;
     NETGridManager gridManager;
-    private bool movementMode = false;
+
+    [SyncVar]
+    public bool movementMode = false;
     private GameObject activeObject;
+
+    [SyncVar]
     public int actionPoints;
     bool turnPanelOpen = false;
     GameObject turnPanel;
@@ -18,20 +24,32 @@ public class NETPlayerMenu : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
+
+    }
+
+    public override void OnStartClient()
+    {
         actionPoints = 0;
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<NETGameManager>();
         gridManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<NETGridManager>();
+     //   gameManager.gameObject.GetComponent<NetworkIdentity>().AssignClientAuthority(this.GetComponent<NetworkIdentity>().connectionToClient);
     }
 
     /// <summary>
     /// Initialize a pawn. Give them a side too.
     /// </summary>
     /// <param name="side"></param>
-    public void InitPlayer(Team side)
+    [Server]
+    public void ServerInitPlayer(Team side)
     {
         playerSide = side;
         Debug.Log("Player side:" + playerSide);
 
+    }
+
+    void OnPlayerSide(Team side)
+    {
+        playerSide = side;
     }
 
     public Team GetPlayerSide() { return playerSide; }
@@ -115,7 +133,7 @@ public class NETPlayerMenu : NetworkBehaviour {
           //      {
                     gridManager.CmdAddPawn(playerSide, floorHitter.transform.position);
                     gameManager.decrementPieces();
-                    gameManager.TogglePlayerTurn();
+                    gameManager.RpcTogglePlayerTurn();
           //      }
             }
         }
@@ -127,7 +145,7 @@ public class NETPlayerMenu : NetworkBehaviour {
                 {
                     gridManager.CmdAddBomb(floorHitter.collider.gameObject);
                     gameManager.decrementBombs();
-                    gameManager.TogglePlayerTurn();
+                    gameManager.RpcTogglePlayerTurn();
                     Debug.Log("Bomb placed");
                 }
             }
@@ -140,7 +158,7 @@ public class NETPlayerMenu : NetworkBehaviour {
                 {
                     gridManager.CmdAddBomb(floorHitter.collider.gameObject);
                     gameManager.decrementNeutralBombs();
-                    gameManager.TogglePlayerTurn();
+                    gameManager.RpcTogglePlayerTurn();
                     Debug.Log("Neutral Bomb placed");
                 }
             }
@@ -184,6 +202,13 @@ public class NETPlayerMenu : NetworkBehaviour {
 
         if(GetPlayerSide() == Team.Blue)
         {
+            if(gridManager == null)
+            {
+                gridManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<NETGridManager>();
+            }
+            if(gameManager == null)
+                gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<NETGameManager>();
+            gridManager.gameObject.GetComponent<NetworkIdentity>().AssignClientAuthority(this.GetComponent<NetworkIdentity>().connectionToClient);
             gridManager.CmdAddPawn(Team.Blue, new Vector3(0, 0, 0));
         }
 
